@@ -1,0 +1,50 @@
+ERROR: Vercel Build Permission Denied - Vite Binary
+====================================================
+
+Error Message:
+--------------
+sh: line 1: /vercel/path0/node_modules/.bin/vite: Permission denied
+Error: Command "npm run build" exited with 126
+
+Root Cause:
+-----------
+The vite binary in node_modules/.bin/vite doesn't have execute permissions
+in the Vercel build environment. This is a common issue when binaries are
+installed without proper permissions or when file permissions aren't preserved
+during deployment.
+
+Solution:
+---------
+Use `npx vite build` instead of `vite build` in the package.json build script.
+The `npx` command handles execution permissions properly and will work even
+if the binary doesn't have execute permissions.
+
+Fixed package.json script:
+--------------------------
+"build": "npx vite build"
+
+Instead of:
+"build": "vite build"
+
+Why This Works:
+--------------
+- `npx` is a package runner that comes with npm
+- It automatically handles permission issues by using Node.js to execute scripts
+- It's more reliable in CI/CD environments like Vercel
+- It ensures the correct version of vite is used from node_modules
+
+Prevention:
+-----------
+- Always use `npx` for build commands in package.json when deploying to Vercel
+- This applies to other build tools as well (TypeScript, ESLint, etc.)
+- Example: "build": "npx vite build" instead of "build": "vite build"
+
+Related Issues:
+--------------
+- Similar permission issues can occur with other binaries (tsc, eslint, etc.)
+- Solution: Use npx for all binary executions in npm scripts
+- Example: "type-check": "npx tsc --noEmit"
+
+Date Fixed: 2024
+File Modified: package.json
+
