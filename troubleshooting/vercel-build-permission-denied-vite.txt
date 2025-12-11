@@ -15,16 +15,22 @@ during deployment.
 
 Solution:
 ---------
-Use `npx vite build` instead of `vite build` in the package.json build script.
-The `npx` command handles execution permissions properly and will work even
-if the binary doesn't have execute permissions.
+Use `node node_modules/vite/bin/vite.js build` instead of `vite build` in the 
+package.json build script. This runs vite directly through Node.js, bypassing
+permission issues with the binary.
 
 Fixed package.json script:
 --------------------------
-"build": "npx vite build"
+"build": "node node_modules/vite/bin/vite.js build"
 
 Instead of:
 "build": "vite build"
+
+Alternative (if above doesn't work):
+------------------------------------
+"build": "npx vite build"
+
+Note: If npx doesn't work, use the node approach above.
 
 Why This Works:
 --------------
