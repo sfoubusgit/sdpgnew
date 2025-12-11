@@ -284,9 +284,142 @@ export function assemblePrompt(
   // Format answers - add context from question when appropriate
   answers.forEach(a => {
     let label = a.label;
+    let handledBySpecialCase = false;
     
-    // First, check if answer is abstract and needs expansion
+    // Special handling for specific questions (check BEFORE abstract expansion)
     if (a.questionText) {
+      const question = a.questionText.toLowerCase();
+      const answerLower = a.label.toLowerCase(); // Use original label, not expanded
+      
+      // "What material textures should be emphasized?" -> "emphasized [material] materials"
+      if (question.includes("what material textures should be emphasized")) {
+        if (answerLower !== "no specific texture focus") {
+          label = `emphasized ${answerLower} materials`;
+          handledBySpecialCase = true;
+        }
+      }
+      // "How saturated should the colors be?" -> "[level] colors"
+      else if (question.includes("how saturated should the colors be")) {
+        label = `${answerLower} colors`;
+        handledBySpecialCase = true;
+      }
+      // "What color palette?" -> "[type] color palette"
+      else if (question.includes("what color palette")) {
+        // Handle special cases
+        if (answerLower === "monochrome") {
+          label = "monochromatic color palette";
+        } else if (answerLower === "earth tones") {
+          label = "earth tones color palette";
+        } else {
+          label = `${answerLower} color palette`;
+        }
+        handledBySpecialCase = true;
+      }
+      // "How vibrant should the face paint be?" -> "[level] paint"
+      else if (question.includes("how vibrant should the face paint be") || 
+               question.includes("how vibrant should the paint be")) {
+        label = `${answerLower} paint`;
+        handledBySpecialCase = true;
+      }
+      // "How technological should the appearance be?" -> "[level] technological appearance"
+      else if (question.includes("how technological should the appearance be")) {
+        label = `${answerLower} technological appearance`;
+        handledBySpecialCase = true;
+      }
+      // "Which fantasy color?" -> "[color] fantasy hair color"
+      else if (question.includes("which fantasy color")) {
+        label = `${answerLower} fantasy hair color`;
+        handledBySpecialCase = true;
+      }
+      // "How much body hair?" -> "[amount] body hair"
+      else if (question.includes("how much body hair")) {
+        // "No body hair" already contains "body hair", so keep it as is
+        if (answerLower.includes("no body hair")) {
+          label = answerLower;
+        } else {
+          label = `${answerLower} body hair`;
+        }
+        handledBySpecialCase = true;
+      }
+      // "How alien should the appearance be?" -> "[level] alien appearance"
+      else if (question.includes("how alien should the appearance be")) {
+        label = `${answerLower} alien appearance`;
+        handledBySpecialCase = true;
+      }
+      // "How visible is the emotion?" -> "[level] emotion"
+      else if (question.includes("how visible is the emotion")) {
+        label = `${answerLower} emotion`;
+        handledBySpecialCase = true;
+      }
+      // "How prominent should textures be?" -> "[level] textures"
+      else if (question.includes("how prominent should textures be")) {
+        label = `${answerLower} textures`;
+        handledBySpecialCase = true;
+      }
+      // "How realistic should it be?" -> "[level] realistic style"
+      else if (question.includes("how realistic should it be")) {
+        label = `${answerLower} realistic style`;
+        handledBySpecialCase = true;
+      }
+      // "How fantastical should it be?" -> "[level] fantastical appearance"
+      else if (question.includes("how fantastical should it be")) {
+        label = `${answerLower} fantastical appearance`;
+        handledBySpecialCase = true;
+      }
+      // "How cinematic should it be?" -> "[level] cinematic style"
+      else if (question.includes("how cinematic should it be")) {
+        label = `${answerLower} cinematic style`;
+        handledBySpecialCase = true;
+      }
+      // "How painterly should it be?" -> "[level] painterly style"
+      else if (question.includes("how painterly should it be")) {
+        label = `${answerLower} painterly style`;
+        handledBySpecialCase = true;
+      }
+      // "How intense should the makeup be?" -> "[level] makeup"
+      else if (question.includes("how intense should the makeup be")) {
+        label = `${answerLower} makeup`;
+        handledBySpecialCase = true;
+      }
+      // "How prominent should the traditional face art be?" -> "[level] traditional face art"
+      else if (question.includes("how prominent should the traditional face art be")) {
+        label = `${answerLower} traditional face art`;
+        handledBySpecialCase = true;
+      }
+      // "How visible should the permanent art be?" -> "[level] permanent art"
+      else if (question.includes("how visible should the permanent art be")) {
+        label = `${answerLower} permanent art`;
+        handledBySpecialCase = true;
+      }
+      // "How prominent should the fantasy markings be?" -> "[level] fantasy markings"
+      else if (question.includes("how prominent should the fantasy markings be")) {
+        label = `${answerLower} fantasy markings`;
+        handledBySpecialCase = true;
+      }
+      // "How sparkly should the adornments be?" -> "[level] adornments"
+      else if (question.includes("how sparkly should the adornments be")) {
+        label = `${answerLower} adornments`;
+        handledBySpecialCase = true;
+      }
+      // "What is the body hair texture?" -> "[texture] body hair texture"
+      else if (question.includes("what is the body hair texture")) {
+        label = `${answerLower} body hair texture`;
+        handledBySpecialCase = true;
+      }
+      // "What is the body hair color?" -> "[color] body hair color"
+      else if (question.includes("what is the body hair color")) {
+        label = `${answerLower} body hair color`;
+        handledBySpecialCase = true;
+      }
+      // "How alien should it be?" (environment, not appearance) -> "[level] alien environment"
+      else if (question.includes("how alien should it be") && !question.includes("appearance")) {
+        label = `${answerLower} alien environment`;
+        handledBySpecialCase = true;
+      }
+    }
+    
+    // If not handled by special case, check if answer is abstract and needs expansion
+    if (!handledBySpecialCase && a.questionText) {
       label = expandAbstractAnswer(a.label, a.questionText);
     }
     
@@ -295,8 +428,8 @@ export function assemblePrompt(
       label = `${label.toLowerCase()} body type`;
     }
     // If question asks "What are the X like?" or "What is the X like?" or "What is the X?", extract subject and append
-    // (but only if not already expanded by expandAbstractAnswer)
-    else if (a.questionText && !ABSTRACT_ANSWERS.includes(a.label.toLowerCase().trim())) {
+    // (but only if not already expanded by expandAbstractAnswer and not handled by special case)
+    else if (!handledBySpecialCase && a.questionText && !ABSTRACT_ANSWERS.includes(a.label.toLowerCase().trim())) {
       const question = a.questionText.toLowerCase();
       
       // Special handling for root question "What are you imagining?"
@@ -496,7 +629,8 @@ export function assemblePrompt(
       const descriptiveTemplates = [
         'penis size', 'breast size', 'vagina size', 'buttocks size',
         'penis detail', 'breast detail', 'vagina detail', 'buttocks detail',
-        'penis shape', 'breast shape', 'buttocks shape'
+        'penis shape', 'breast shape', 'buttocks shape',
+        'naughtiness level'
       ];
       
       const isDescriptive = descriptiveTemplates.some(dt => templateLower.includes(dt));

@@ -5,6 +5,7 @@ import { PreviewPanel } from '../components/PreviewPanel/PreviewPanel';
 import { SelectionSummary } from '../components/SelectionSummary/SelectionSummary';
 import { CategorySidebar } from '../components/CategorySidebar/CategorySidebar';
 import { CustomPromptElements } from '../components/CustomPromptElements/CustomPromptElements';
+import { AdBanner } from '../components/AdBanner/AdBanner';
 import './InterviewPage.css';
 
 export function InterviewPage() {
@@ -341,6 +342,7 @@ export function InterviewPage() {
                 onCustomExtensionChange={(ext) => setCustomExtension(currentNodeId, ext)}
               />
             )}
+            <AdBanner format="banner" />
           </div>
         <div className="interview-right">
           <PreviewPanel

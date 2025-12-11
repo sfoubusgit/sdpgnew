@@ -11,6 +11,9 @@ function App() {
           <Route path="/" element={<InterviewPage />} />
           <Route path="/tutorial" element={<TutorialPage />} />
         </Routes>
+        <div className="attribution">
+          made by Sina Foudehi aka BrieOfStability
+        </div>
       </div>
     </BrowserRouter>
   );
